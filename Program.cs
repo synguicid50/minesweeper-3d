@@ -1,11 +1,23 @@
 ﻿Console.CursorVisible = false;
 Console.Title = "Minesweeper 3D";
 Console.OutputEncoding = System.Text.Encoding.UTF8;
-
 //TODO: configure a display buffer
-List<int>? ConfigureLatticeDimensions()
+
+
+var latticeDimensions = (0, 0, 0);
+int mineCount = 0;
+
+ConfigureLattice(ref latticeDimensions, ref mineCount);
+
+int cellCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimensions.Item3;
+
+
+
+Dictionary<int, int> latticeMap = new Dictionary<int, int>();
+
+
+void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
-    //beginner 9^3 intermediate 16^3 expert 25^3
     List<string> defaultDiffLevels = new List<string>
     {
         "Beginner      ",
@@ -58,12 +70,34 @@ List<int>? ConfigureLatticeDimensions()
     switch (arrowPos)
     {
         case 0:
-            return new List<int> { 9, 9, 9 };
+            latticeDimensions = (5, 5, 5);
+            mineCount = 15;
+            break;
         case 1:
-            return new List<int> { 16, 16, 16 };
+            latticeDimensions = (7, 7, 7);
+            mineCount = 55;
+            break;
         case 2:
-            return new List<int> { 25, 25, 25 };
-        default:
-            return null; //type? is nullable, not that this is ever going to return null
+            latticeDimensions = (9, 9, 9);
+            mineCount = 145;
+            break;
     }
 }
+void PlaceMines()
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
