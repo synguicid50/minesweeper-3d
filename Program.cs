@@ -166,13 +166,13 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
 
     for (int i = 0; i < tileSet.Count; i++)
     {
-        if (tileSet[i] < 0 || tileSet[i] > tileCount)
+        if (tileSet[i] < 0 || tileSet[i] > (tileCount - 1))
         {
             tileSet.RemoveAt(i);
             i--;
         }
     }
 
-    tileSet.Sort();
+    //tileSet.Sort();
     return tileSet;
 }
