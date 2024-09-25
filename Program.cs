@@ -13,27 +13,14 @@ int tileCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimen
 Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
-for (int i = 0; i < tileCount; i++)
+Console.Clear();
+for (int i = 0; i < latticeMap.Count; i++)
 {
-    Console.Write($"\n{i}: ");
-    if (i<10)
+    if (latticeMap.ContainsKey(i))
     {
-        Console.Write(" ");
-    }
-    foreach (var item in FindAdjacentTiles(i, latticeDimensions))
-    {
-        if (item < 10)
-        {
-            Console.Write(" ");
-        }
-        if (item < 100)
-        {
-            Console.Write(" ");
-        }
-        Console.Write($"{item} ");
+        Console.Write($"{latticeMap[i]} ");
     }
 }
-
 
 
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
@@ -91,15 +78,15 @@ void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
     {
         case 0:
             latticeDimensions = (5, 5, 5);
-            mineCount = 15;
+            mineCount = 10;
             break;
         case 1:
             latticeDimensions = (7, 7, 7);
-            mineCount = 55;
+            mineCount = 33;
             break;
         case 2:
             latticeDimensions = (9, 9, 9);
-            mineCount = 145;
+            mineCount = 99;
             break;
     }
 }
@@ -116,12 +103,27 @@ void ConfigureLatticeData(int tileCount, int mineCount, ref Dictionary<int, int>
         if (!latticeMap.ContainsKey(randomTile))
         {
             latticeMap.Add(randomTile, 9);
-            //Console.Write($"{randomTile} ");
             iteration++;
         }
     }
-}
 
+    for (int i = 0; i < tileCount; i++)
+    {
+        if (!latticeMap.ContainsKey(i))
+        {
+            List<int> adjacentTiles = FindAdjacentTiles(i, latticeDimensions);
+            int tileNumber = 0;
+            for (int j = 0; j < FindAdjacentTiles(i, latticeDimensions).Count; j++)
+            {
+                if (latticeMap.ContainsKey(adjacentTiles[j]) && latticeMap[adjacentTiles[j]] == 9)
+                {
+                    tileNumber++;
+                }
+            }
+            latticeMap.Add(i, tileNumber);
+        }
+    }
+}
 List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensions)
 {
     List<int> tileSet = new List<int>
@@ -173,6 +175,6 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
         }
     }
 
-    //tileSet.Sort();
+    //tileSet.Sort(); not really needed
     return tileSet;
 }
