@@ -1,8 +1,6 @@
 ﻿Console.CursorVisible = false;
 Console.Title = "Minesweeper 3D";
 Console.OutputEncoding = System.Text.Encoding.UTF8;
-//TODO: configure a display buffer
-
 
 var latticeDimensions = (0, 0, 0);
 int mineCount = 0;
@@ -13,15 +11,9 @@ int tileCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimen
 Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
-Console.Clear();
-//for (int i = 0; i < latticeMap.Count; i++)
-//{
-//    if (latticeMap.ContainsKey(i))
-//    {
-//        Console.Write($"{latticeMap[i]} ");
-//    }
-//}
+string latticeBuffer1, latticeBuffer2, latticeBuffer3;
 
+Console.Clear();
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
     List<string> defaultDiffLevels = new List<string>
@@ -185,16 +177,10 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
     tileCoords.z = (tileIndex - (tileIndex % (latticeDimensions.x * latticeDimensions.y))) / (latticeDimensions.x * latticeDimensions.y);
     return tileCoords;
 }
-void DisplayLattice(int viewPlane, Dictionary<int, int> latticeMap, (int x, int y, int z) latticeDimensions, int focusTile)
+void AllocateLatticeBuffer((int x, int y, int z) latticeDimensions, ref string latticeBuffer1, ref string latticeBuffer2, ref string latticeBuffer3)
 {
-    switch (viewPlane)
-    {
-        case 1:
-            break;
-        case 2:
-            break;
-        case 3:
-            break;
-    }
+    //1-top 2-front 3-left
+
+
 }
 
