@@ -14,14 +14,13 @@ Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
 Console.Clear();
-for (int i = 0; i < latticeMap.Count; i++)
-{
-    if (latticeMap.ContainsKey(i))
-    {
-        Console.Write($"{latticeMap[i]} ");
-    }
-}
-
+//for (int i = 0; i < latticeMap.Count; i++)
+//{
+//    if (latticeMap.ContainsKey(i))
+//    {
+//        Console.Write($"{latticeMap[i]} ");
+//    }
+//}
 
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
@@ -126,39 +125,41 @@ void ConfigureLatticeData(int tileCount, int mineCount, ref Dictionary<int, int>
 }
 List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensions)
 {
+    var tileCoords = FindTileCoordinates(tileIndex, latticeDimensions);
+
     List<int> tileSet = new List<int>
     {
         tileIndex,
         tileIndex + latticeDimensions.x * latticeDimensions.y,
         tileIndex - latticeDimensions.x * latticeDimensions.y
     };
-    
+
     int tileSetCount = 3;
     int tempCount = 0;
     for (int i = 0; i < tileSetCount; i++)
     {
-        if (((tileIndex - (tileIndex % latticeDimensions.x)) % (latticeDimensions.x * latticeDimensions.y)) / latticeDimensions.x != latticeDimensions.y - 1) // (:
+        if (tileCoords.y != latticeDimensions.y - 1)
         {
             tileSet.Add(tileSet[i] + latticeDimensions.x);
             tempCount++;
         }
-        if (((tileIndex - (tileIndex % latticeDimensions.x)) % (latticeDimensions.x * latticeDimensions.y)) / latticeDimensions.x != 0)
+        if (tileCoords.y != 0)
         {
             tileSet.Add(tileSet[i] - latticeDimensions.x);
             tempCount++;
-        }       
+        }
     }
 
     tileSetCount += tempCount;
     for (int i = 0; i < tileSetCount; i++)
     {
-        if (tileIndex % latticeDimensions.x != latticeDimensions.x - 1)
+        if (tileCoords.x != latticeDimensions.x - 1)
         {
             tileSet.Add(tileSet[i] + 1);
         }
-        if (tileIndex % latticeDimensions.x != 0)
+        if (tileCoords.x != 0)
         {
-            tileSet.Add(tileSet[i] - 1);       
+            tileSet.Add(tileSet[i] - 1);
         }
     }
 
@@ -174,7 +175,26 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
             i--;
         }
     }
-
-    //tileSet.Sort(); not really needed
     return tileSet;
 }
+(int x, int y, int z) FindTileCoordinates(int tileIndex, (int x, int y, int z) latticeDimensions)
+{
+    var tileCoords = (x: 0, y: 0, z: 0);
+    tileCoords.x = tileIndex % latticeDimensions.x;
+    tileCoords.y = ((tileIndex - (tileIndex % latticeDimensions.x)) % (latticeDimensions.x * latticeDimensions.y)) / latticeDimensions.x; // (:
+    tileCoords.z = (tileIndex - (tileIndex % (latticeDimensions.x * latticeDimensions.y))) / (latticeDimensions.x * latticeDimensions.y);
+    return tileCoords;
+}
+void DisplayLattice(int viewPlane, Dictionary<int, int> latticeMap, (int x, int y, int z) latticeDimensions, int focusTile)
+{
+    switch (viewPlane)
+    {
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+    }
+}
+
