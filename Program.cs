@@ -6,44 +6,61 @@ var latticeDimensions = (x: 0, y: 0, z: 0);
 int mineCount = 0;
 ConfigureLattice(ref latticeDimensions, ref mineCount);
 
-
-
 int tileCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimensions.Item3;
-
 Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
-LatticeDisplayConfig top;
-top.viewPlane = 3;
-List<char> hTiles = new List<char>()
-{
-    '/'
-};
-List<char> edge = new List<char>();
-for (int i = 0; i < latticeDimensions.y; i++)
-{
-    hTiles.AddRange(new List<char>
-    {
-        '_','_','_','/'
-    });
-    edge.AddRange(new List<char>
-    {
-        ' ', '_', '_', '_'
-    });
-}
-top.horizontalTiles = new string(hTiles.ToArray());
-top.edge = new string(edge.ToArray());
-top.verticalTiles = new char[]
-{
-    '|','/'
-};
-
 Console.Clear();
-//Console.WriteLine(top.edge);
-//Console.WriteLine(top.horizontalTiles);
-DisplayLattice(top, 10);
+
+LatticeDisplayConfig topView = new LatticeDisplayConfig();
+SetLatticeConfig(ref topView, 1);
+LatticeDisplayConfig frontView = new LatticeDisplayConfig();
+SetLatticeConfig(ref frontView, 2);
+LatticeDisplayConfig leftView = new LatticeDisplayConfig();
+SetLatticeConfig(ref leftView, 3);
 
 
+
+
+DisplayLattice(leftView, 0);
+
+
+void SetLatticeConfig(ref LatticeDisplayConfig config, int viewPlane)
+{
+    config.viewPlane = viewPlane;
+
+    switch (viewPlane)
+    {
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            List<char> hTiles = new List<char>()
+                {
+                    '/'
+                };
+            List<char> edge = new List<char>();
+            for (int i = 0; i < latticeDimensions.y; i++)
+            {
+                hTiles.AddRange(new List<char>
+                    {
+                        '_','_','_','/'
+                    });
+                edge.AddRange(new List<char>
+                    {
+                        ' ', '_', '_', '_'
+                    });
+            }
+            config.horizontalTiles = new string(hTiles.ToArray());
+            config.edge = new string(edge.ToArray());
+            config.verticalTiles = new char[]
+            {
+                '|','/'
+            };
+            break;
+    }
+}
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
     List<string> defaultDiffLevels = new List<string>
@@ -134,7 +151,7 @@ void ConfigureLatticeData(int tileCount, int mineCount, ref Dictionary<int, int>
         {
             List<int> adjacentTiles = FindAdjacentTiles(i, latticeDimensions);
             int tileNumber = 0;
-            for (int j = 0; j < FindAdjacentTiles(i, latticeDimensions).Count; j++)
+            for (int j = 0; j < adjacentTiles.Count; j++)
             {
                 if (latticeMap.ContainsKey(adjacentTiles[j]) && latticeMap[adjacentTiles[j]] == 9)
                 {
@@ -210,9 +227,9 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
 
 void DisplayLattice(LatticeDisplayConfig view, int focusTile)
 {
-
-    var focusTileCoords = FindTileCoordinates(focusTile, latticeDimensions);
     
+    var focusTileCoords = FindTileCoordinates(focusTile, latticeDimensions);
+
     switch (view.viewPlane)
     {
         case 1:
@@ -240,7 +257,7 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
 
                 for (int j = 0; j < vTilesWidth; j++)
                 {
-                    Console.Write(view.verticalTiles[j % 2]);    
+                    Console.Write(view.verticalTiles[j % 2]);
                 }
                 vTilesWidth++;
                 Console.WriteLine();
@@ -249,11 +266,44 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
             break;
     }
 }
+
+void DisplayGridLine(int line, (int x, int y, int z) latticeDimensions, LatticeDisplayConfig view)
+{
+    int gridHeight = view.viewPlane == 1 ? latticeDimensions.y : latticeDimensions.z;
+
+    if (line == 0)
+    {
+        //top
+    }
+    else if (line == gridHeight - 1)
+    {
+        //bottom
+    }
+    else if (line % 2 == 0)
+    {
+        //midline
+    }
+    else
+    {
+        //numberline
+    }
+}
+
 struct LatticeDisplayConfig
 {
     internal int viewPlane;
     internal char[] verticalTiles;
     internal string horizontalTiles;
     internal string edge;
+
+    internal GridDisplayConfig grid;
+
+}
+struct GridDisplayConfig
+{
+    internal string topline;
+    internal string bottomline;
+    internal string midline;
+    internal char[] dataline;
 }
 
