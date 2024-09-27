@@ -220,10 +220,30 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
         case 2:
             break;
         case 3:
-            Console.Write(view.edge);
-            for (int i = 0; i < (latticeDimensions.x - (focusTileCoords.x + 1)); i++)
+            string indent = "         ";
+            int vTilesWidth = 1;
+
+            for (int i = 0; i < (latticeDimensions.x - focusTileCoords.x); i++)
             {
-                Console.Write($"\n{view.horizontalTiles}");
+                Console.Write(" ");
+            }
+            Console.WriteLine(indent + view.edge);
+
+            for (int i = (latticeDimensions.x - (focusTileCoords.x + 1)); i >= 0; i--)
+            {
+                Console.Write(indent);
+                for (int j = 0; j < i; j++)
+                {
+                    Console.Write(" ");
+                }
+                Console.Write($"{view.horizontalTiles}");
+
+                for (int j = 0; j < vTilesWidth; j++)
+                {
+                    Console.Write(view.verticalTiles[j % 2]);    
+                }
+                vTilesWidth++;
+                Console.WriteLine();
             }
 
             break;
