@@ -2,18 +2,48 @@
 Console.Title = "Minesweeper 3D";
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-var latticeDimensions = (0, 0, 0);
+var latticeDimensions = (x: 0, y: 0, z: 0);
 int mineCount = 0;
 ConfigureLattice(ref latticeDimensions, ref mineCount);
+
+
 
 int tileCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimensions.Item3;
 
 Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
-string latticeBuffer1, latticeBuffer2, latticeBuffer3;
+LatticeDisplayConfig top;
+top.viewPlane = 3;
+List<char> hTiles = new List<char>()
+{
+    '/'
+};
+List<char> edge = new List<char>();
+for (int i = 0; i < latticeDimensions.y; i++)
+{
+    hTiles.AddRange(new List<char>
+    {
+        '_','_','_','/'
+    });
+    edge.AddRange(new List<char>
+    {
+        ' ', '_', '_', '_'
+    });
+}
+top.horizontalTiles = new string(hTiles.ToArray());
+top.edge = new string(edge.ToArray());
+top.verticalTiles = new char[]
+{
+    '|','/'
+};
 
 Console.Clear();
+//Console.WriteLine(top.edge);
+//Console.WriteLine(top.horizontalTiles);
+DisplayLattice(top, 10);
+
+
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
     List<string> defaultDiffLevels = new List<string>
@@ -177,10 +207,33 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
     tileCoords.z = (tileIndex - (tileIndex % (latticeDimensions.x * latticeDimensions.y))) / (latticeDimensions.x * latticeDimensions.y);
     return tileCoords;
 }
-void AllocateLatticeBuffer((int x, int y, int z) latticeDimensions, ref string latticeBuffer1, ref string latticeBuffer2, ref string latticeBuffer3)
+
+void DisplayLattice(LatticeDisplayConfig view, int focusTile)
 {
-    //1-top 2-front 3-left
 
+    var focusTileCoords = FindTileCoordinates(focusTile, latticeDimensions);
+    
+    switch (view.viewPlane)
+    {
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            Console.Write(view.edge);
+            for (int i = 0; i < (latticeDimensions.x - (focusTileCoords.x + 1)); i++)
+            {
+                Console.Write($"\n{view.horizontalTiles}");
+            }
 
+            break;
+    }
+}
+struct LatticeDisplayConfig
+{
+    internal int viewPlane;
+    internal char[] verticalTiles;
+    internal string horizontalTiles;
+    internal string edge;
 }
 
