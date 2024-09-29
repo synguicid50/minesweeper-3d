@@ -11,6 +11,8 @@ int tileCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimen
 Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
+List<int> visibleTiles = new List<int>();
+
 LatticeDisplayConfig topView = new LatticeDisplayConfig();
 SetDisplayConfig(ref topView, 1);
 LatticeDisplayConfig frontView = new LatticeDisplayConfig();
@@ -20,16 +22,12 @@ SetDisplayConfig(ref leftView, 3);
 
 
 DisplayLattice(leftView, 0);
-Console.WriteLine(leftView.grid.topLine);
-Console.WriteLine(leftView.grid.midLine);
-Console.WriteLine(leftView.grid.bottomLine);
-Console.WriteLine(leftView.grid.dataLine);
+
 
 
 void SetDisplayConfig(ref LatticeDisplayConfig config, int view)
 {
     config.view = view;
-    var gridSize = (x: 0, y: 0);
 
     switch (view)
     {
@@ -60,7 +58,6 @@ void SetDisplayConfig(ref LatticeDisplayConfig config, int view)
             {
                 '|','/'
             };
-            gridSize = (latticeDimensions.z, latticeDimensions.y);
             break;
     }
 
@@ -78,9 +75,9 @@ void SetDisplayConfig(ref LatticeDisplayConfig config, int view)
     };
     List<char> dataLine = new List<char>
     {
-        '\u2551', ' ', ' ', ' '
+        '\u2551'
     };
-    for (int i = 0; i < gridSize.y - 1; i++)
+    for (int i = 0; i < config.grid.gridWidth - 1; i++)
     {
         topLine.AddRange(new List<char>
         {
@@ -94,10 +91,7 @@ void SetDisplayConfig(ref LatticeDisplayConfig config, int view)
         {
             '\u2567','\u2550','\u2550','\u2550'
         });
-        dataLine.AddRange(new List<char>
-        {
-            '\u2502', ' ', ' ', ' '
-        });
+        dataLine.Add('\u2571');
     }
     topLine.Add('\u2557');
     midLine.Add('\u2562');
@@ -108,6 +102,11 @@ void SetDisplayConfig(ref LatticeDisplayConfig config, int view)
     config.grid.midLine = new string(midLine.ToArray());
     config.grid.bottomLine = new string(bottomLine.ToArray());
     config.grid.dataLine = dataLine.ToArray();
+
+    config.grid.gridHeight = config.view == 1 ? latticeDimensions.y : latticeDimensions.z;
+    config.grid.gridHeight = config.grid.gridHeight * 2 + 1;
+    config.grid.gridWidth = config.view == 3 ? latticeDimensions.y : latticeDimensions.x;
+    config.grid.gridWidth = config.grid.gridWidth * 4 + 1;
 }
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
@@ -272,12 +271,12 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
     tileCoords.z = (tileIndex - (tileIndex % (latticeDimensions.x * latticeDimensions.y))) / (latticeDimensions.x * latticeDimensions.y);
     return tileCoords;
 }
-void DisplayLattice(LatticeDisplayConfig view, int focusTile)
+void DisplayLattice(LatticeDisplayConfig config, int focusTile)
 {
 
     var focusTileCoords = FindTileCoordinates(focusTile, latticeDimensions);
 
-    switch (view.view)
+    switch (config.view)
     {
         case 1:
             break;
@@ -291,7 +290,7 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
             {
                 Console.Write(" ");
             }
-            Console.WriteLine(indent + view.edge);
+            Console.WriteLine(indent + config.edge);
 
             for (int i = (latticeDimensions.x - (focusTileCoords.x + 1)); i >= 0; i--)
             {
@@ -300,11 +299,11 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
                 {
                     Console.Write(" ");
                 }
-                Console.Write($"{view.horizontalTiles}");
+                Console.Write($"{config.horizontalTiles}");
 
                 for (int j = 0; j < vTilesWidth; j++)
                 {
-                    Console.Write(view.verticalTiles[j % 2]);
+                    Console.Write(config.verticalTiles[j % 2]);
                 }
                 vTilesWidth++;
                 Console.WriteLine();
@@ -312,26 +311,52 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
 
             break;
     }
+
+    for (int i = 0; i < config.grid.gridHeight; i++)
+    {
+        Console.Write($"\n");
+        DisplayGridLine(i, latticeDimensions, leftView, 0, latticeMap, visibleTiles);
+    }
 }
-void DisplayGridLine(int line, (int x, int y, int z) latticeDimensions, LatticeDisplayConfig view)
+void DisplayGridLine(int line, (int x, int y, int z) latticeDimensions, LatticeDisplayConfig config, int focusTile, Dictionary<int, int> latticeMap, List<int> visibleTiles)
 {
-    int gridHeight = view.view == 1 ? latticeDimensions.y : latticeDimensions.z;
+
+
+    var tileBackground = (left: ' ', right: ' ');
+    var focusTileBrackets = (left: '{', right: '}');
+    var invisibleTileBrackets = (left: '[', right: ']');
+
+    char tileCenter = ' ';
 
     if (line == 0)
     {
-        //top
+        Console.Write(config.grid.topLine);
     }
-    else if (line == gridHeight - 1)
+    else if (line == config.grid.gridHeight - 1)
     {
-        //bottom
+        Console.Write(config.grid.bottomLine);
     }
     else if (line % 2 == 0)
     {
-        //midline
+        Console.Write(config.grid.midLine);
     }
     else
     {
-        //dataline
+        int j = 0;
+        for (int i = 0; i < config.grid.gridWidth; i++)
+        {
+            Console.Write(config.grid.dataLine[j++]);
+            if (!visibleTiles.Contains(focusTile))
+            {
+                tileBackground = invisibleTileBrackets;
+            }
+            else if (true)
+            {
+
+            }
+            Console.Write(tileBackground.left + tileCenter + tileBackground.right);
+        }
+        Console.Write(config.grid.dataLine.Last());
     }
 }
 struct LatticeDisplayConfig
@@ -350,5 +375,7 @@ struct GridDisplayConfig
     internal string bottomLine;
     internal string midLine;
     internal char[] dataLine;
+    internal int gridWidth;
+    internal int gridHeight;
 }
 
