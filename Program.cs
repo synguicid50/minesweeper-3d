@@ -5,31 +5,33 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 var latticeDimensions = (x: 0, y: 0, z: 0);
 int mineCount = 0;
 ConfigureLattice(ref latticeDimensions, ref mineCount);
+Console.Clear();
 
 int tileCount = latticeDimensions.Item1 * latticeDimensions.Item2 * latticeDimensions.Item3;
 Dictionary<int, int> latticeMap = new Dictionary<int, int>();
 ConfigureLatticeData(tileCount, mineCount, ref latticeMap);
 
-Console.Clear();
-
 LatticeDisplayConfig topView = new LatticeDisplayConfig();
-SetLatticeConfig(ref topView, 1);
+SetDisplayConfig(ref topView, 1);
 LatticeDisplayConfig frontView = new LatticeDisplayConfig();
-SetLatticeConfig(ref frontView, 2);
+SetDisplayConfig(ref frontView, 2);
 LatticeDisplayConfig leftView = new LatticeDisplayConfig();
-SetLatticeConfig(ref leftView, 3);
-
-
+SetDisplayConfig(ref leftView, 3);
 
 
 DisplayLattice(leftView, 0);
+Console.WriteLine(leftView.grid.topLine);
+Console.WriteLine(leftView.grid.midLine);
+Console.WriteLine(leftView.grid.bottomLine);
+Console.WriteLine(leftView.grid.dataLine);
 
 
-void SetLatticeConfig(ref LatticeDisplayConfig config, int viewPlane)
+void SetDisplayConfig(ref LatticeDisplayConfig config, int view)
 {
-    config.viewPlane = viewPlane;
+    config.view = view;
+    var gridSize = (x: 0, y: 0);
 
-    switch (viewPlane)
+    switch (view)
     {
         case 1:
             break;
@@ -58,8 +60,54 @@ void SetLatticeConfig(ref LatticeDisplayConfig config, int viewPlane)
             {
                 '|','/'
             };
+            gridSize = (latticeDimensions.z, latticeDimensions.y);
             break;
     }
+
+    List<char> topLine = new List<char>
+    {
+        '\u2554','\u2550','\u2550','\u2550'
+    };
+    List<char> midLine = new List<char>
+    {
+        '\u255F','\u2500','\u2500','\u2500'
+    };
+    List<char> bottomLine = new List<char>
+    {
+        '\u255A','\u2550','\u2550','\u2550'
+    };
+    List<char> dataLine = new List<char>
+    {
+        '\u2551', ' ', ' ', ' '
+    };
+    for (int i = 0; i < gridSize.y - 1; i++)
+    {
+        topLine.AddRange(new List<char>
+        {
+            '\u2564','\u2550','\u2550','\u2550'
+        });
+        midLine.AddRange(new List<char>
+        {
+            '\u253C','\u2500','\u2500','\u2500'
+        });
+        bottomLine.AddRange(new List<char>
+        {
+            '\u2567','\u2550','\u2550','\u2550'
+        });
+        dataLine.AddRange(new List<char>
+        {
+            '\u2502', ' ', ' ', ' '
+        });
+    }
+    topLine.Add('\u2557');
+    midLine.Add('\u2562');
+    bottomLine.Add('\u255D');
+    dataLine.Add('\u2551');
+
+    config.grid.topLine = new string(topLine.ToArray());
+    config.grid.midLine = new string(midLine.ToArray());
+    config.grid.bottomLine = new string(bottomLine.ToArray());
+    config.grid.dataLine = dataLine.ToArray();
 }
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
@@ -224,13 +272,12 @@ List<int> FindAdjacentTiles(int tileIndex, (int x, int y, int z) latticeDimensio
     tileCoords.z = (tileIndex - (tileIndex % (latticeDimensions.x * latticeDimensions.y))) / (latticeDimensions.x * latticeDimensions.y);
     return tileCoords;
 }
-
 void DisplayLattice(LatticeDisplayConfig view, int focusTile)
 {
-    
+
     var focusTileCoords = FindTileCoordinates(focusTile, latticeDimensions);
 
-    switch (view.viewPlane)
+    switch (view.view)
     {
         case 1:
             break;
@@ -266,10 +313,9 @@ void DisplayLattice(LatticeDisplayConfig view, int focusTile)
             break;
     }
 }
-
 void DisplayGridLine(int line, (int x, int y, int z) latticeDimensions, LatticeDisplayConfig view)
 {
-    int gridHeight = view.viewPlane == 1 ? latticeDimensions.y : latticeDimensions.z;
+    int gridHeight = view.view == 1 ? latticeDimensions.y : latticeDimensions.z;
 
     if (line == 0)
     {
@@ -285,13 +331,12 @@ void DisplayGridLine(int line, (int x, int y, int z) latticeDimensions, LatticeD
     }
     else
     {
-        //numberline
+        //dataline
     }
 }
-
 struct LatticeDisplayConfig
 {
-    internal int viewPlane;
+    internal int view;
     internal char[] verticalTiles;
     internal string horizontalTiles;
     internal string edge;
@@ -301,9 +346,9 @@ struct LatticeDisplayConfig
 }
 struct GridDisplayConfig
 {
-    internal string topline;
-    internal string bottomline;
-    internal string midline;
-    internal char[] dataline;
+    internal string topLine;
+    internal string bottomLine;
+    internal string midLine;
+    internal char[] dataLine;
 }
 
