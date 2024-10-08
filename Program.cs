@@ -11,7 +11,6 @@ Console.Clear();
 Dictionary<(int x, int y, int z), (int tileData, bool isVisible, bool isFlagged)> latticeMap = new();
 ConfigureLatticeData(ref latticeMap);
 
-
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
     List<string> defaultDiffLevels = new List<string>
@@ -134,11 +133,11 @@ List<(int, int, int)> FindAdjacentTiles((int x, int y, int z) tile)
 {
     List<(int, int, int)> adjacentTiles = new();
 
-    for (int i = -1; i < 1; i += 2)
+    for (int i = -1; i <= 1; i++)
     {
-        for (int j = -1; j < 1; j += 2)
+        for (int j = -1; j <= 1; j++)
         {
-            for (int k = -1; k < 1; k += 2)
+            for (int k = -1; k <= 1; k++)
             {
                 if (latticeMap.ContainsKey((tile.x + i, tile.y + j, tile.z + k)))
                 {
@@ -147,6 +146,8 @@ List<(int, int, int)> FindAdjacentTiles((int x, int y, int z) tile)
             }
         }
     }
+
+    adjacentTiles.Remove(tile);
 
     return adjacentTiles;
 }
