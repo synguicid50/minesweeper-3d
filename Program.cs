@@ -1,5 +1,5 @@
 ﻿Console.CursorVisible = false;
-Console.Title = "Minesweeper 3D";
+Console.Title = "MS3D";
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 var latticeDimensions = (x: 0, y: 0, z: 0);
@@ -23,7 +23,7 @@ void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
         "Beginner      ",
         "Intermediate  ",
         "Expert        ",
-        "TestDimensions (5,6,7)"
+        "::DEBUG:: (5,6,7)"
     };
 
     bool inputReceived = false;
@@ -163,8 +163,9 @@ void Sweep()
     while (!gameOver)
     {
         Console.Clear();
-        Console.WriteLine($"view: {view}");
-        Console.WriteLine($"focusTile: ({focusTile.x}, {focusTile.y}, {focusTile.z})");
+        DisplayHUD();
+        DisplayLattice();
+        Console.WriteLine($"\n ::DEBUG:: focusTile: ({focusTile.x}, {focusTile.y}, {focusTile.z})");
 
         ConsoleKey userInput = Console.ReadKey().Key;
 
@@ -214,14 +215,10 @@ void Sweep()
      
     }
 }
-void DisplayLattice()
-{
 
-}
-
-void DisplayHUD(int view)
+void DisplayHUD()
 {
-    Console.WriteLine($" Move around in the grid with [WASD] or [\u2190\u2191\u2192\u2193], move between layers with [Q] and [E].\n Press [SPACE] to destroy a tile, press [F] to place or remove a flag.");
+    Console.WriteLine($" Move around in the layer with [WASD] or [\u2190\u2191\u2192\u2193], move between layers with [Q] and [E].\n Press [SPACE] to destroy a tile, press [F] to place or remove a flag.");
 
     Console.Write(" View: ");
 
@@ -237,7 +234,7 @@ void DisplayHUD(int view)
         }
     }
 
-    Console.Write($"    [*] {mineCount - flagCount} ");
+    Console.Write($"    [*] {mineCount - flagCount}    ");
 
     if (mineCount - flagCount < 100)
     {
@@ -248,5 +245,9 @@ void DisplayHUD(int view)
         }
     }
 
-    Console.Write($"[\u2690] {flagCount}");
+    Console.Write($"[\u2690] {flagCount}\n");
+}
+void DisplayLattice()
+{
+
 }
