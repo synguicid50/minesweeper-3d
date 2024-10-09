@@ -13,8 +13,8 @@ Dictionary<(int x, int y, int z), (int tileData, bool isVisible, bool isFlagged)
 ConfigureLatticeData(ref latticeMap);
 
 int view = 1;
-var focusTile = (x:2, y:2, z:2); //todo place this at the approximate center
-DisplayHUD(1);
+var focusTile = (x: 2, y: 2, z: 2); //todo place this at the approximate center
+Sweep();
 
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
@@ -162,6 +162,10 @@ void Sweep()
 
     while (!gameOver)
     {
+        Console.Clear();
+        Console.WriteLine($"view: {view}");
+        Console.WriteLine($"focusTile: ({focusTile.x}, {focusTile.y}, {focusTile.z})");
+
         ConsoleKey userInput = Console.ReadKey().Key;
 
         switch (userInput)
@@ -176,12 +180,38 @@ void Sweep()
                 view = 3;
                 break;
             case ConsoleKey.Q: //ternary operators go brrr
-                focusTile = (view == 1 && focusTile.z > 0 && focusTile.z < latticeDimensions.z - 1) ? (focusTile.x, focusTile.y, focusTile.z--) : ((view == 2 && focusTile.y > 0 && focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y--, focusTile.z) : ((view == 3 && focusTile.x > 0 && focusTile.x < latticeDimensions.x - 1) ? (focusTile.x--, focusTile.y, focusTile.z) : (focusTile)));
+                focusTile = (view == 1 && focusTile.z > 0) ? (focusTile.x, focusTile.y, focusTile.z - 1) : ((view == 2 && focusTile.y > 0) ? (focusTile.x, focusTile.y - 1, focusTile.z) : ((view == 3 && focusTile.x > 0) ? (focusTile.x - 1, focusTile.y, focusTile.z) : (focusTile)));
                 break;
             case ConsoleKey.E:
-                focusTile = (view == 1 && focusTile.z > 0 && focusTile.z < latticeDimensions.z - 1) ? (focusTile.x, focusTile.y, focusTile.z++) : ((view == 2 && focusTile.y > 0 && focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y++, focusTile.z) : ((view == 3 && focusTile.x > 0 && focusTile.x < latticeDimensions.x - 1) ? (focusTile.x++, focusTile.y, focusTile.z) : (focusTile)));
+                focusTile = (view == 1 && focusTile.z < latticeDimensions.z - 1) ? (focusTile.x, focusTile.y, focusTile.z + 1) : ((view == 2 && focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y + 1, focusTile.z) : ((view == 3 && focusTile.x < latticeDimensions.x - 1) ? (focusTile.x + 1, focusTile.y, focusTile.z) : (focusTile)));
+                break;
+            case ConsoleKey.UpArrow:
+            case ConsoleKey.W:
+                focusTile = (view == 1) ? ((focusTile.y > 0) ? (focusTile.x, focusTile.y - 1, focusTile.z) : focusTile) : ((focusTile.z < latticeDimensions.z - 1) ? (focusTile.x, focusTile.y, focusTile.z + 1) : (focusTile));
+                break;
+            case ConsoleKey.DownArrow:
+            case ConsoleKey.S:
+                focusTile = (view == 1) ? ((focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y + 1, focusTile.z) : focusTile) : ((focusTile.z > 0) ? (focusTile.x, focusTile.y, focusTile.z - 1) : (focusTile));
+                break;
+            case ConsoleKey.LeftArrow:
+            case ConsoleKey.A:
+                focusTile = (view == 3) ? ((focusTile.y > 0) ? (focusTile.x, focusTile.y - 1, focusTile.z) : focusTile) : ((focusTile.x < latticeDimensions.x - 1) ? (focusTile.x + 1, focusTile.y, focusTile.z) : (focusTile));
+                break;
+            case ConsoleKey.RightArrow:
+            case ConsoleKey.D:
+                focusTile = (view == 3) ? ((focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y + 1, focusTile.z) : focusTile) : ((focusTile.x > 0) ? (focusTile.x - 1, focusTile.y, focusTile.z) : (focusTile));
+                break;
+            case ConsoleKey.Spacebar:
+                if (!latticeMap[focusTile].isVisible)
+                {
+                    latticeMap[focusTile] = (latticeMap[focusTile].tileData, true, latticeMap[focusTile].isFlagged);
+                }
+                break;
+            case ConsoleKey.F:
+                latticeMap[focusTile] = (latticeMap[focusTile].tileData, latticeMap[focusTile].isVisible, !latticeMap[focusTile].isFlagged);
                 break;
         }
+     
     }
 }
 void DisplayLattice()
