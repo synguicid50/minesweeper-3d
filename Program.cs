@@ -175,16 +175,15 @@ void Sweep()
             case ConsoleKey.D3:
                 view = 3;
                 break;
-            case ConsoleKey.Q:
-                
+            case ConsoleKey.Q: //ternary operators go brrr
+                focusTile = (view == 1 && focusTile.z > 0 && focusTile.z < latticeDimensions.z - 1) ? (focusTile.x, focusTile.y, focusTile.z--) : ((view == 2 && focusTile.y > 0 && focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y--, focusTile.z) : ((view == 3 && focusTile.x > 0 && focusTile.x < latticeDimensions.x - 1) ? (focusTile.x--, focusTile.y, focusTile.z) : (focusTile)));
                 break;
             case ConsoleKey.E:
-
+                focusTile = (view == 1 && focusTile.z > 0 && focusTile.z < latticeDimensions.z - 1) ? (focusTile.x, focusTile.y, focusTile.z++) : ((view == 2 && focusTile.y > 0 && focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y++, focusTile.z) : ((view == 3 && focusTile.x > 0 && focusTile.x < latticeDimensions.x - 1) ? (focusTile.x++, focusTile.y, focusTile.z) : (focusTile)));
                 break;
         }
     }
 }
-
 void DisplayLattice()
 {
 
