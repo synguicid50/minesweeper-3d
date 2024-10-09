@@ -13,7 +13,7 @@ Dictionary<(int x, int y, int z), (int tileData, bool isVisible, bool isFlagged)
 ConfigureLatticeData(ref latticeMap);
 
 int view = 1;
-var focusTile = (x: 2, y: 2, z: 2); //todo place this at the approximate center
+var focusTile = (x: (latticeDimensions.x - (latticeDimensions.x % 2)) / 2, y: (latticeDimensions.y - (latticeDimensions.y % 2)) / 2, z: (latticeDimensions.z - (latticeDimensions.z % 2)) / 2);
 Sweep();
 
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
