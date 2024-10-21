@@ -86,7 +86,7 @@ void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
             break;
         case 3:
             latticeDimensions = (5, 6, 7);
-            mineCount = 25;
+            mineCount = 10;
             break;
     }
 }
@@ -156,22 +156,29 @@ List<(int, int, int)> FindAdjacentTiles((int x, int y, int z) tile)
 
     return adjacentTiles;
 }
-
 void ChainClear((int x, int y, int z) tile)
 {
-    if (latticeMap[tile].isVisible) return;
+    List<(int x, int y, int z)> chainedTiles = new();
 
     foreach (var adjacentTile in FindAdjacentTiles(tile))
     {
-        if (!latticeMap[adjacentTile].isVisible && latticeMap[adjacentTile].tileData == 0)
+        if (!latticeMap[adjacentTile].isVisible && !latticeMap[adjacentTile].isFlagged)
         {
-            ChainClear(adjacentTile);
+            latticeMap[adjacentTile] = (latticeMap[adjacentTile].tileData, true, false);
+            visibleTileCount++;
+
+            if (latticeMap[adjacentTile].tileData == 0)
+            {
+                chainedTiles.Add(adjacentTile);
+            }
         }
     }
+
+    foreach (var chainedTile in chainedTiles)
+    {
+        ChainClear(chainedTile);
+    }
 }
-
-
-
 void DisplayHUD()
 {
     Console.WriteLine($" Move around in the layer with [WASD] or [\u2190\u2191\u2192\u2193], move between layers with [Q] and [E].\n Press [SPACE] to destroy a tile, press [F] to place or remove a flag.");
@@ -256,9 +263,12 @@ void Sweep()
                 focusTile = (view == 3) ? ((focusTile.y < latticeDimensions.y - 1) ? (focusTile.x, focusTile.y + 1, focusTile.z) : focusTile) : ((focusTile.x > 0) ? (focusTile.x - 1, focusTile.y, focusTile.z) : (focusTile));
                 break;
             case ConsoleKey.Spacebar:
+            case ConsoleKey.Enter:
                 if (!latticeMap[focusTile].isVisible && !latticeMap[focusTile].isFlagged)
                 {
-                    latticeMap[focusTile] = (latticeMap[focusTile].tileData, true, latticeMap[focusTile].isFlagged);
+                    latticeMap[focusTile] = (latticeMap[focusTile].tileData, true, false);
+                    visibleTileCount++;
+
                     if (latticeMap[focusTile].tileData == 0)
                     {
                         ChainClear(focusTile);
@@ -266,9 +276,11 @@ void Sweep()
                 }
                 break;
             case ConsoleKey.F:
+                flagCount = latticeMap[focusTile].isFlagged ? flagCount - 1 : flagCount + 1;
                 latticeMap[focusTile] = (latticeMap[focusTile].tileData, latticeMap[focusTile].isVisible, !latticeMap[focusTile].isFlagged);
                 break;
         }
 
+        //TODO check win/lose conditions (maybe inside case consolekey.space:)
     }
 }
