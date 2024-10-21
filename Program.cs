@@ -31,7 +31,6 @@ void Main()
 
     Sweep();
 }
-
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
     List<string> defaultDiffLevels = new List<string>
@@ -213,10 +212,10 @@ void DisplayHUD()
 
     Console.Write($"    [*] {mineCount - flagCount}    ");
 
-    if ((mineCount - flagCount) < 100 && (mineCount - flagCount) > -100)
+    if ((mineCount - flagCount) < 100 && (mineCount - flagCount) > -10)
     {
         Console.Write(" ");
-        if ((mineCount - flagCount) < 10 && (mineCount - flagCount) > -10)
+        if ((mineCount - flagCount) < 10 && (mineCount - flagCount) > -1)
         {
             Console.Write(" ");
         }
@@ -228,7 +227,6 @@ void DisplayLattice()
 {
 
 }
-
 void Sweep()
 {
     bool gameOver = false;
@@ -314,10 +312,20 @@ void Sweep()
     gameTimer.Stop();
     decimal gameTimeSec = Convert.ToDecimal(gameTimer.Elapsed.Milliseconds) / 1000;
 
+    foreach (var key in latticeMap.Keys)
+    {
+        if (!latticeMap[key].isVisible)
+        {
+            latticeMap[key] = (latticeMap[key].tileData, true, false);
+        }
+    }
+
     bool quitCommand = false;
 
     while (!quitCommand)
     {
+        Console.Clear();
+
         if (gameWon)
         {
             Console.WriteLine($"--- WELL DONE ---\nYou have completed the game in just {gameTimeSec} seconds\nPress [R] to restart, press [Q] to quit");
@@ -326,6 +334,8 @@ void Sweep()
         {
             Console.WriteLine($"--- GAME OVER ---\nYou have failed miserably in just {gameTimeSec} seconds\nPress [R] to restart, press [Q] to quit");
         }
+
+        DisplayLattice();
 
         ConsoleKey userInput = Console.ReadKey().Key;
 
