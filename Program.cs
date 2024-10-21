@@ -1,22 +1,36 @@
-﻿Console.CursorVisible = false;
+﻿using System;
+using System.Diagnostics;
+
+Console.CursorVisible = false;
 Console.Title = "MS3D";
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 var latticeDimensions = (x: 0, y: 0, z: 0);
-int mineCount = 0;
-int flagCount = 0;
-int visibleTileCount = 0;
-
-ConfigureLattice(ref latticeDimensions, ref mineCount);
-Console.Clear();
-
+int mineCount;
+int flagCount;
+int visibleTileCount;
 Dictionary<(int x, int y, int z), (int tileData, bool isVisible, bool isFlagged)> latticeMap = new();
-ConfigureLatticeData(ref latticeMap);
+int view;
+(int x, int y, int z) focusTile = (0, 0, 0);
 
-int view = 1;
-var focusTile = (x: (latticeDimensions.x - (latticeDimensions.x % 2)) / 2, y: (latticeDimensions.y - (latticeDimensions.y % 2)) / 2, z: (latticeDimensions.z - (latticeDimensions.z % 2)) / 2);
+Main();
+void Main()
+{
+    Console.Clear();
 
-Sweep();
+    latticeDimensions = (x: 0, y: 0, z: 0);
+    mineCount = 0;
+    flagCount = 0;
+    visibleTileCount = 0;
+    view = 1;
+    latticeMap.Clear();
+    focusTile = (x: (latticeDimensions.x - (latticeDimensions.x % 2)) / 2, y: (latticeDimensions.y - (latticeDimensions.y % 2)) / 2, z: (latticeDimensions.z - (latticeDimensions.z % 2)) / 2);
+
+    ConfigureLattice(ref latticeDimensions, ref mineCount);
+    ConfigureLatticeData(ref latticeMap);
+
+    Sweep();
+}
 
 void ConfigureLattice(ref (int, int, int) latticeDimensions, ref int mineCount)
 {
@@ -220,6 +234,9 @@ void Sweep()
     bool gameOver = false;
     bool gameWon = false;
 
+    Stopwatch gameTimer = new Stopwatch();
+    gameTimer.Start();
+
     while (!gameOver)
     {
         Console.Clear();
@@ -266,6 +283,11 @@ void Sweep()
             case ConsoleKey.Enter:
                 if (!latticeMap[focusTile].isVisible && !latticeMap[focusTile].isFlagged)
                 {
+                    if (latticeMap[focusTile].tileData == 9)
+                    {
+                        gameOver = true;
+                        break;
+                    }
                     latticeMap[focusTile] = (latticeMap[focusTile].tileData, true, false);
                     visibleTileCount++;
 
@@ -274,6 +296,12 @@ void Sweep()
                         ChainClear(focusTile);
                     }
                 }
+
+                if (visibleTileCount + mineCount == latticeMap.Keys.Count)
+                {
+                    gameOver = true;
+                    gameWon = true;
+                }
                 break;
             case ConsoleKey.F:
                 flagCount = latticeMap[focusTile].isFlagged ? flagCount - 1 : flagCount + 1;
@@ -281,6 +309,36 @@ void Sweep()
                 break;
         }
 
-        //TODO check win/lose conditions (maybe inside case consolekey.space:)
+    }
+
+    gameTimer.Stop();
+    decimal gameTimeSec = Convert.ToDecimal(gameTimer.Elapsed.Milliseconds) / 1000;
+
+    bool quitCommand = false;
+
+    while (!quitCommand)
+    {
+        if (gameWon)
+        {
+            Console.WriteLine($"--- WELL DONE ---\nYou have completed the game in just {gameTimeSec} seconds\nPress [R] to restart, press [Q] to quit");
+        }
+        else
+        {
+            Console.WriteLine($"--- GAME OVER ---\nYou have failed miserably in just {gameTimeSec} seconds\nPress [R] to restart, press [Q] to quit");
+        }
+
+        ConsoleKey userInput = Console.ReadKey().Key;
+
+        switch (userInput)
+        {
+            case ConsoleKey.R:
+                Main();
+                break;
+            case ConsoleKey.Q:
+                quitCommand = true;
+                break;
+            default:
+                break;
+        }
     }
 }
